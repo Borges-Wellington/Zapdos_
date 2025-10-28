@@ -1,0 +1,473 @@
+// ======================================================================
+//  POGOProtos.proto (Consolidado)
+//  Reconstruído a partir de POGOProtos.pb.swift e v0.241.x_p_obf.proto
+//  © 2025 - Estrutura fiel ao modelo consolidado clássico
+// ======================================================================
+
+syntax = "proto3";
+
+package POGOProtos;
+
+option optimize_for = SPEED;
+
+// ===============================================================
+//  ENUMS PRINCIPAIS
+// ===============================================================
+
+enum Gender {
+  GENDER_UNSET = 0;
+  MALE = 1;
+  FEMALE = 2;
+  GENDERLESS = 3;
+}
+
+enum PokemonDisplayForm {
+  FORM_UNSET = 0;
+  FORM_ALOLA = 1;
+  FORM_GALAR = 2;
+  FORM_HISUI = 3;
+  FORM_MEGA = 4;
+}
+
+enum PokemonDisplayCostume {
+  COSTUME_NONE = 0;
+  COSTUME_HOLIDAY_2023 = 1;
+  COSTUME_SHADOW = 2;
+  COSTUME_PURIFIED = 3;
+  COSTUME_EVENT = 4;
+}
+
+enum PokemonDisplayAlignment {
+  NORMAL = 0;
+  SHADOW = 1;
+  PURIFIED = 2;
+}
+
+// ===============================================================
+//  MENSAGENS DE POKÉMON E JOGADOR
+// ===============================================================
+
+message PokemonDisplayProto {
+  PokemonDisplayForm form = 1;
+  PokemonDisplayCostume costume = 2;
+  PokemonDisplayAlignment alignment = 3;
+  Gender gender = 4;
+  bool shiny = 5;
+}
+
+message PokemonStats {
+  int32 base_stamina = 1;
+  int32 base_attack = 2;
+  int32 base_defense = 3;
+}
+
+message PokemonMoveSet {
+  int32 quick_move = 1;
+  int32 cinematic_move = 2;
+  int32 elite_quick_move = 3;
+  int32 elite_cinematic_move = 4;
+}
+
+message PokemonData {
+  uint64 id = 1;
+  int32 pokemon_id = 2;
+  int32 cp = 3;
+  int32 stamina = 4;
+  int32 stamina_max = 5;
+  int32 move1 = 6;
+  int32 move2 = 7;
+  int32 move3 = 8;
+  PokemonDisplayProto display = 9;
+  float height_m = 10;
+  float weight_kg = 11;
+  float individual_attack = 12;
+  float individual_defense = 13;
+  float individual_stamina = 14;
+  float cp_multiplier = 15;
+  float additional_cp_multiplier = 16;
+  int64 creation_time_ms = 17;
+  bool favorite = 18;
+  bool deployed = 19;
+  bool is_egg = 20;
+  int64 egg_incubator_id = 21;
+  float origin_latitude = 22;
+  float origin_longitude = 23;
+  bool from_trade = 24;
+  bool lucky = 25;
+  bool shiny = 26;
+  bool shadow = 27;
+  bool purified = 28;
+}
+
+message PlayerData {
+  string username = 1;
+  int32 team = 2;
+  int32 level = 3;
+  int64 experience = 4;
+  int64 stardust = 5;
+  int64 poke_coins = 6;
+  int64 km_walked = 7;
+  int64 pokemons_caught = 8;
+  int64 pokestops_visited = 9;
+  int64 battles_won = 10;
+  int64 battles_lost = 11;
+  int32 buddy_pokemon_id = 12;
+  float buddy_km_walked = 13;
+  int32 avatar_hat = 14;
+  int32 avatar_shirt = 15;
+  int32 avatar_pants = 16;
+  int32 avatar_shoes = 17;
+  int32 avatar_backpack = 18;
+  string country_code = 19;
+  string start_date = 20;
+}
+
+// ===============================================================
+//  RPCs (Requests & Responses)
+// ===============================================================
+
+enum Platform {
+  UNKNOWN_PLATFORM = 0;
+  ANDROID = 1;
+  IOS = 2;
+}
+
+enum StatusCode {
+  SUCCESS = 1;
+  ERROR_INVALID_REQUEST = 2;
+  ERROR_AUTH_EXPIRED = 3;
+  ERROR_BANNED = 4;
+  ERROR_UNKNOWN = 5;
+}
+
+message RequestEnvelope {
+  int64 request_id = 1;
+  double latitude = 2;
+  double longitude = 3;
+  Platform platform = 4;
+  bytes auth_ticket = 5;
+  repeated PlatformRequest requests = 6;
+  int64 ms_since_last_locationfix = 7;
+  bytes unknown12 = 8;
+  bytes client_version = 9;
+}
+
+message ResponseEnvelope {
+  int64 request_id = 1;
+  StatusCode status_code = 2;
+  bytes auth_ticket = 3;
+  repeated PlatformResponse responses = 4;
+  string api_url = 5;
+  bool banned = 6;
+  int64 server_ms = 7;
+}
+
+message PlatformRequest {
+  string request_name = 1;
+  bytes request_message = 2;
+}
+
+message PlatformResponse {
+  string response_name = 1;
+  bytes response_message = 2;
+}
+
+message GetMapObjectsRequest {
+  repeated int64 cell_id = 1;
+  double latitude = 2;
+  double longitude = 3;
+}
+
+message GetMapObjectsResponse {
+  repeated MapCell map_cells = 1;
+  int64 timestamp = 2;
+}
+
+message MapCell {
+  int64 s2_cell_id = 1;
+  int64 current_timestamp_ms = 2;
+  repeated WildPokemon wild_pokemons = 3;
+  repeated FortData forts = 4;
+  repeated ClientWeather weather = 5;
+}
+
+message WildPokemon {
+  PokemonData pokemon_data = 1;
+  double latitude = 2;
+  double longitude = 3;
+  int64 encounter_id = 4;
+  int64 expiration_timestamp_ms = 5;
+}
+
+message EncounterRequest {
+  int64 encounter_id = 1;
+  double player_latitude = 2;
+  double player_longitude = 3;
+}
+
+message EncounterResponse {
+  enum Status {
+    ENCOUNTER_SUCCESS = 1;
+    ENCOUNTER_FAILED = 2;
+    ENCOUNTER_NOT_FOUND = 3;
+    ENCOUNTER_POKEMON_FLED = 4;
+  }
+
+  Status status = 1;
+  PokemonData pokemon = 2;
+  bool is_active = 3;
+  int64 capture_probability = 4;
+  string background = 5;
+}
+
+message CatchPokemonRequest {
+  int64 encounter_id = 1;
+  double pokeball_latitude = 2;
+  double pokeball_longitude = 3;
+  int32 pokeball_type = 4;
+  double normalized_reticle_size = 5;
+  double spin_modifier = 6;
+  double normalized_hit_position = 7;
+}
+
+message CatchPokemonResponse {
+  enum Status {
+    CATCH_SUCCESS = 1;
+    CATCH_ESCAPE = 2;
+    CATCH_FLEE = 3;
+    CATCH_MISSED = 4;
+    CATCH_ERROR = 5;
+  }
+
+  Status status = 1;
+  int32 captured_pokemon_id = 2;
+  PokemonData captured_pokemon = 3;
+  int64 capture_award_xp = 4;
+  int64 capture_award_stardust = 5;
+  int32 balls_remaining = 6;
+}
+
+message GetPlayerRequest {
+  bool include_profile = 1;
+}
+
+message GetPlayerResponse {
+  PlayerData player_data = 1;
+  int64 server_time_ms = 2;
+}
+
+message GetInventoryRequest {
+  int64 last_timestamp_ms = 1;
+}
+
+message GetInventoryResponse {
+  repeated InventoryItem inventory_items = 1;
+  int64 new_timestamp_ms = 2;
+}
+
+// ===============================================================
+//  INVENTÁRIO E ITENS
+// ===============================================================
+
+enum ItemCategory {
+  ITEM_CATEGORY_NONE = 0;
+  ITEM_CATEGORY_POKEBALL = 1;
+  ITEM_CATEGORY_POTION = 2;
+  ITEM_CATEGORY_REVIVE = 3;
+  ITEM_CATEGORY_BERRY = 4;
+  ITEM_CATEGORY_MISC = 5;
+  ITEM_CATEGORY_CAMERA = 6;
+  ITEM_CATEGORY_INCENSE = 7;
+  ITEM_CATEGORY_EGG_INCUBATOR = 8;
+  ITEM_CATEGORY_DISK = 9;
+  ITEM_CATEGORY_XP_BOOST = 10;
+  ITEM_CATEGORY_EVOLUTION = 11;
+  ITEM_CATEGORY_RAID_PASS = 12;
+}
+
+enum ItemType {
+  ITEM_UNKNOWN = 0;
+  ITEM_POKE_BALL = 1;
+  ITEM_GREAT_BALL = 2;
+  ITEM_ULTRA_BALL = 3;
+  ITEM_MASTER_BALL = 4;
+  ITEM_POTION = 5;
+  ITEM_SUPER_POTION = 6;
+  ITEM_HYPER_POTION = 7;
+  ITEM_MAX_POTION = 8;
+  ITEM_REVIVE = 9;
+  ITEM_MAX_REVIVE = 10;
+  ITEM_RAZZ_BERRY = 11;
+  ITEM_PINAP_BERRY = 12;
+  ITEM_NANAB_BERRY = 13;
+  ITEM_GOLDEN_RAZZ_BERRY = 14;
+  ITEM_SILVER_PINAP_BERRY = 15;
+  ITEM_LURE_MODULE = 16;
+  ITEM_INCENSE = 17;
+  ITEM_LUCKY_EGG = 18;
+  ITEM_CAMERA = 19;
+  ITEM_EGG_INCUBATOR = 20;
+  ITEM_RAID_PASS = 21;
+  ITEM_REMOTE_PASS = 22;
+}
+
+message ItemProto {
+  ItemType item_id = 1;
+  string name = 2;
+  ItemCategory category = 3;
+  string description = 4;
+  bool is_tradable = 5;
+  int32 sort_order = 6;
+}
+
+message AppliedItem {
+  ItemType item_id = 1;
+  int64 applied_ms = 2;
+  int64 expiration_ms = 3;
+  int32 usage_count = 4;
+  bool active = 5;
+}
+
+message InventoryItemData {
+  oneof data {
+    PokemonData pokemon = 1;
+    ItemProto item = 2;
+    AppliedItem applied_item = 3;
+    EggIncubator egg_incubator = 4;
+  }
+}
+
+message InventoryItem {
+  int64 modified_timestamp_ms = 1;
+  int64 deleted_item_key = 2;
+  InventoryItemData inventory_item_data = 3;
+}
+
+message EggIncubator {
+  string id = 1;
+  int64 start_km_walked = 2;
+  int64 target_km_walked = 3;
+  bool in_use = 4;
+  ItemType item_type = 5;
+}
+
+// ===============================================================
+//  QUESTS / WEATHER / FRIENDS / BATTLE / SETTINGS
+// ===============================================================
+
+enum QuestType {
+  QUEST_UNSET = 0;
+  QUEST_CATCH_POKEMON = 1;
+  QUEST_SPIN_POKESTOP = 2;
+  QUEST_HATCH_EGG = 3;
+  QUEST_WIN_RAID = 4;
+  QUEST_COMPLETE_BATTLE = 5;
+  QUEST_TRADE_POKEMON = 6;
+  QUEST_SEND_GIFT = 7;
+  QUEST_PHOTO_POKEMON = 8;
+}
+
+message QuestCondition {
+  QuestType type = 1;
+  int32 amount = 2;
+  string parameter = 3;
+}
+
+message QuestReward {
+  string reward_type = 1;
+  int32 amount = 2;
+  string item = 3;
+}
+
+message Quest {
+  string id = 1;
+  QuestType quest_type = 2;
+  repeated QuestCondition conditions = 3;
+  repeated QuestReward rewards = 4;
+  int64 creation_timestamp_ms = 5;
+  bool completed = 6;
+}
+
+enum WeatherCondition {
+  WEATHER_NONE = 0;
+  WEATHER_CLEAR = 1;
+  WEATHER_RAINY = 2;
+  WEATHER_PARTLY_CLOUDY = 3;
+  WEATHER_OVERCAST = 4;
+  WEATHER_WINDY = 5;
+  WEATHER_SNOW = 6;
+  WEATHER_FOG = 7;
+}
+
+message ClientWeather {
+  int64 cell_id = 1;
+  WeatherCondition display_condition = 2;
+  int32 severity = 3;
+  float wind_speed = 4;
+  float cloud_level = 5;
+  float rain_level = 6;
+  float snow_level = 7;
+}
+
+enum FriendshipLevel {
+  FRIENDSHIP_UNSET = 0;
+  FRIENDSHIP_GOOD = 1;
+  FRIENDSHIP_GREAT = 2;
+  FRIENDSHIP_ULTRA = 3;
+  FRIENDSHIP_BEST = 4;
+}
+
+message FriendProfile {
+  string username = 1;
+  int32 level = 2;
+  FriendshipLevel friendship_level = 3;
+  int64 last_interaction_ms = 4;
+  bool online = 5;
+}
+
+message FriendList {
+  repeated FriendProfile friends = 1;
+  int32 total_friends = 2;
+  int32 total_requests = 3;
+}
+
+enum BattleResult {
+  BATTLE_RESULT_NONE = 0;
+  BATTLE_RESULT_WIN = 1;
+  BATTLE_RESULT_LOSS = 2;
+  BATTLE_RESULT_DRAW = 3;
+}
+
+message BattlePokemon {
+  PokemonData pokemon = 1;
+  int32 current_hp = 2;
+  bool fainted = 3;
+}
+
+message BattleState {
+  repeated BattlePokemon player_pokemon = 1;
+  repeated BattlePokemon opponent_pokemon = 2;
+  int32 round = 3;
+  BattleResult result = 4;
+  int64 battle_start_ms = 5;
+  int64 battle_end_ms = 6;
+}
+
+message GameSettings {
+  float map_zoom_min = 1;
+  float map_zoom_max = 2;
+  float encounter_distance = 3;
+  int32 max_friends = 4;
+  int32 max_gift_per_day = 5;
+  int32 buddy_bonus_xp = 6;
+  bool enable_weather = 7;
+  bool enable_pvp = 8;
+  bool enable_raid = 9;
+}
+
+message ClientSettings {
+  string version = 1;
+  GameSettings game_settings = 2;
+  bool force_update = 3;
+  string update_url = 4;
+}

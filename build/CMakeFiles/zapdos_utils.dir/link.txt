@@ -1,0 +1,2 @@
+/usr/bin/ar qc libzapdos_utils.a CMakeFiles/zapdos_utils.dir/src/Utils.cpp.o
+/usr/bin/ranlib libzapdos_utils.a

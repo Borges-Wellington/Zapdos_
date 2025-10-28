@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/inspector.dir/link.d CMakeFiles/inspector.dir/src/inspector.cpp.o CMakeFiles/inspector.dir/proto_gen/rotom.pb.cc.o -o inspector  /usr/lib/x86_64-linux-gnu/libprotobuf.so /usr/lib/x86_64-linux-gnu/libz.so

@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/gen_sample.dir/link.d CMakeFiles/gen_sample.dir/tools/gen_sample.cpp.o CMakeFiles/gen_sample.dir/proto_gen/rotom.pb.cc.o -o gen_sample  /usr/lib/x86_64-linux-gnu/libprotobuf.so
